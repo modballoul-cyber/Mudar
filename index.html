@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مساعد الكيتو الشخصي v3</title>
+  <style>
+    :root{
+      --bg:#08101d;
+      --panel:#0f172a;
+      --card:#111b2e;
+      --card2:#0c1525;
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --border:#334155;
+      --green:#22c55e;
+      --blue:#38bdf8;
+      --yellow:#f59e0b;
+      --red:#ef4444;
+      --purple:#a855f7;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#07101a,#08101d 35%,#111827);
+      color:var(--text);
+    }
+    .app{
+      display:grid;
+      grid-template-columns:290px 1fr;
+      min-height:100vh;
+    }
+    .sidebar{
+      background:rgba(8,16,29,.96);
+      border-left:1px solid var(--border);
+      padding:18px 14px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+    }
+    .brand{
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:linear-gradient(135deg, rgba(34,197,94,.16), rgba(56,189,248,.14));
+      margin-bottom:14px;
+    }
+    .brand h1{margin:0;font-size:22px}
+    .brand p{margin:8px 0 0;color:#dbeafe;line-height:1.8;font-size:13px}
+    .nav{display:flex;flex-direction:column;gap:9px}
+    .nav button{
+      width:100%;
+      text-align:right;
+      border:1px solid var(--border);
+      background:#111b2e;
+      color:var(--text);
+      padding:11px 13px;
+      border-radius:14px;
+      cursor:pointer;
+      font:inherit;
+      transition:.2s ease;
+    }
+    .nav button:hover,.nav button.active{
+      background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(56,189,248,.15));
+      border-color:#4b6b8e;
+      transform:translateY(-1px);
+    }
+    .sidebar small{
+      color:var(--muted);
+      line-height:1.8;
+      display:block;
+      margin-top:14px;
+    }
+    .content{
+      padding:22px;
+      width:min(1280px,100%);
+    }
+    .topbar{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:12px;
+      margin-bottom:16px;
+    }
+    .stat{
+      background:rgba(17,24,39,.85);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      min-height:88px;
+    }
+    .stat .label{color:var(--muted);font-size:12px}
+    .stat .value{font-size:22px;font-weight:700;margin-top:8px}
+    .page{
+      display:none;
+      background:rgba(17,24,39,.86);
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:20px;
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+    }
+    .page.active{display:block}
+    h2{margin:0 0 10px;font-size:24px}
+    h3{margin:0 0 8px;font-size:18px}
+    p{line-height:1.8}
+    .muted{color:var(--muted)}
+    .grid{display:grid;gap:16px}
+    .grid-2{grid-template-columns:1fr 1fr}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .card{
+      background:#0c1525;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+    }
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    input,select,textarea,button{
+      font:inherit;
+      border-radius:12px;
+      padding:11px 13px;
+    }
+    input,select,textarea{
+      border:1px solid var(--border);
+      background:#08101d;
+      color:var(--text);
+      min-width:180px;
+    }
+    textarea{width:100%;min-height:110px;resize:vertical}
+    .btn{
+      border:none;
+      color:#fff;
+      cursor:pointer;
+      background:linear-gradient(135deg, var(--green), #16a34a);
+      font-weight:700;
+    }
+    .btn.blue{background:linear-gradient(135deg,var(--blue),#0ea5e9)}
+    .btn.yellow{background:linear-gradient(135deg,var(--yellow),#d97706)}
+    .btn.red{background:linear-gradient(135deg,var(--red),#dc2626)}
+    .btn.purple{background:linear-gradient(135deg,var(--purple),#9333ea)}
+    .result{
+      margin-top:14px;
+      background:#08101d;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      line-height:1.9;
+    }
+    .badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin-left:8px;
+    }
+    .ok{background:rgba(34,197,94,.18);color:#86efac;border:1px solid rgba(34,197,94,.35)}
+    .caution{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid rgba(245,158,11,.35)}
+    .no{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.35)}
+    .meal-card,.item-card{
+      background:#08101d;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:16px;
+      margin-bottom:12px;
+    }
+    .meal-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .tag{
+      display:inline-block;
+      margin:6px 6px 0 0;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#132038;
+      border:1px solid var(--border);
+      color:#bfdbfe;
+      font-size:12px;
+    }
+    .qty{
+      background:#0f1b31;
+      border:1px solid #39516f;
+      color:#dbeafe;
+      border-radius:12px;
+      padding:10px 12px;
+      margin-top:10px;
+      line-height:1.8;
+    }
+    .small{font-size:13px}
+    ul.clean{
+      margin:8px 0 0;
+      padding:0 18px 0 0;
+      line-height:1.9;
+    }
+    .note{
+      background:rgba(56,189,248,.08);
+      border:1px solid rgba(56,189,248,.22);
+      border-radius:14px;
+      padding:12px 14px;
+      color:#dbeafe;
+      margin-top:12px;
+      line-height:1.8;
+    }
+    .danger-note{
+      background:rgba(239,68,68,.08);
+      border:1px solid rgba(239,68,68,.22);
+      border-radius:14px;
+      padding:12px 14px;
+      color:#fecaca;
+      margin-top:12px;
+      line-height:1.8;
+    }
+    .progress{
+      width:100%;
+      height:12px;
+      background:#0a1322;
+      border:1px solid var(--border);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .progress > div{
+      height:100%;
+      background:linear-gradient(90deg,var(--green),var(--blue));
+      width:0%;
+      transition:.25s ease;
+    }
+    .shopping-list label{
+      display:block;
+      padding:8px 10px;
+      border-bottom:1px dashed rgba(148,163,184,.15);
+    }
+    .calendar{
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:10px;
+    }
+    .day-card{
+      background:#08101d;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      min-height:180px;
+    }
+    .day-card h4{margin:0 0 8px;font-size:15px}
+    .print-row{margin-top:14px}
+    @media (max-width: 1100px){
+      .topbar{grid-template-columns:repeat(2,1fr)}
+      .grid-2,.grid-3,.calendar{grid-template-columns:1fr}
+    }
+    @media (max-width: 900px){
+      .app{grid-template-columns:1fr}
+      .sidebar{
+        position:relative;
+        height:auto;
+        border-left:none;
+        border-bottom:1px solid var(--border);
+      }
+      .content{padding:16px}
+    }
+    @media print{
+      .sidebar,.topbar,.print-row,.nav{display:none !important}
+      body{background:#fff;color:#000}
+      .content{padding:0;width:100%}
+      .page{display:block !important;border:none;box-shadow:none;background:#fff;color:#000}
+      .card,.meal-card,.item-card,.result,.day-card{border:1px solid #ccc;background:#fff;color:#000}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>مساعد الكيتو الشخصي v3</h1>
+      <p>نسخة أقوى: صفحات داخلية، كميات أوضح، تتبع يومي، كارب تقريبي، خطة أسبوعية، قائمة مشتريات، وسجل طعام. لأن السؤال "شو بدي آكل هلق؟" صار مشروعًا إداريًا كاملًا.</p>
+    </div>
+    <div class="nav">
+      <button class="active" onclick="showPage('dashboard', this)">الرئيسية</button>
+      <button onclick="showPage('food-check', this)">فحص الطعام والكميات</button>
+      <button onclick="showPage('meal-generator', this)">اقتراح من مكوناتك</button>
+      <button onclick="showPage('library', this)">مكتبة الوجبات</button>
+      <button onclick="showPage('hungry', this)">أنا جوعان</button>
+      <button onclick="showPage('tracker', this)">التتبع اليومي</button>
+      <button onclick="showPage('weekly', this)">الخطة الأسبوعية</button>
+      <button onclick="showPage('shopping', this)">قائمة المشتريات</button>
+      <button onclick="showPage('schedule', this)">تنظيم الوجبتين</button>
+      <button onclick="showPage('snacks', this)">النقرشة السريعة</button>
+      <button onclick="showPage('restaurants', this)">خيارات خارج البيت</button>
+      <button onclick="showPage('favorites', this)">المفضلة</button>
+      <button onclick="showPage('guide', this)">دليل الالتزام</button>
+    </div>
+    <small>
+      الكميات هنا عملية وتقريبية لتسهيل الالتزام. ليست تشخيصًا طبيًا فرديًا. إذا عندك سكري أو مرض كلوي أو أدوية تحتاج متابعة، لا تبنِ حياتك على ثقتك الزائدة فقط.
+    </small>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div class="stat"><div class="label">عدد الوجبات</div><div class="value" id="mealCount">0</div></div>
+      <div class="stat"><div class="label">المفضلة</div><div class="value" id="favCount">0</div></div>
+      <div class="stat"><div class="label">آخر وجبة</div><div class="value small" id="lastMealDisplay">غير مسجلة</div></div>
+      <div class="stat"><div class="label">الوجبة القادمة</div><div class="value small" id="nextMealDisplay">غير محددة</div></div>
+      <div class="stat"><div class="label">كارب اليوم</div><div class="value" id="todayCarbsDisplay">0 g</div></div>
+    </div>
+
+    <section id="dashboard" class="page active">
+      <h2>الرئيسية</h2>
+      <p class="muted">هذه النسخة صارت أداة فعلية أكثر من مجرد ملف جميل. فيها تتبع يومي، كارب تقريبي، خطة أسبوعية، ومشتريات. يعني نعم، حولنا "شو آكل" إلى لوحة تشغيل، لأن الإنسان ينهار غالبًا عند أبسط قرار متكرر.</p>
+      <div class="grid grid-3">
+        <div class="card">
+          <h3>الموجود الآن</h3>
+          <ul class="clean">
+            <li>فحص طعام مع كميات تقريبية</li>
+            <li>اقتراح من مكوناتك</li>
+            <li>وجبات مع portions واضحة</li>
+            <li>زر أنا جوعان</li>
+            <li>تنظيم وجبتين يوميًا</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>التطوير الجديد</h3>
+          <ul class="clean">
+            <li>سجل أكل يومي</li>
+            <li>عداد كارب تقريبي</li>
+            <li>خطة أسبوعية مولدة تلقائيًا</li>
+            <li>قائمة مشتريات من الخطة</li>
+            <li>أفكار أكل خارج البيت</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>أفضل استخدام</h3>
+          <div class="note">
+            ثبّت الوجبتين. سجّل أي وجبة أكلتها. تابع كارب اليوم. وإذا جعت، لا تفاوض الكيس الكامل من المكسرات كأنه صديقك.
+          </div>
+        </div>
+      </div>
+      <div class="print-row row">
+        <button class="btn purple" onclick="window.print()">طباعة / حفظ PDF</button>
+      </div>
+    </section>
+
+    <section id="food-check" class="page">
+      <h2>فحص الطعام والكميات</h2>
+      <p class="muted">اكتب اسم الطعام لتحصل على تصنيف واضح، كمية مناسبة تقريبية، وحد يجب الانتباه له.</p>
+      <div class="row">
+        <input id="foodInput" placeholder="مثال: لبنة، رز، تونة، مكسرات..." />
+        <button class="btn" onclick="checkFood()">افحص</button>
+      </div>
+      <div class="result" id="foodResult">اكتب اسم الطعام وسأعطيك التصنيف والكمية التقريبية المناسبة.</div>
+      <div class="grid grid-3" id="quickFoods" style="margin-top:14px"></div>
+    </section>
+
+    <section id="meal-generator" class="page">
+      <h2>أعطِني المكونات الموجودة عندك</h2>
+      <p class="muted">سأقترح لك وجبات مناسبة مع كمية تقريبية للوجبة.</p>
+      <textarea id="ingredientsInput" placeholder="بيض، لبنة، خيار، تونة، زيت زيتون..."></textarea>
+      <div class="row">
+        <select id="goalFilter">
+          <option value="all">أي هدف مناسب</option>
+          <option value="weight">نزول وزن</option>
+          <option value="fast">سريع</option>
+          <option value="cheap">اقتصادي</option>
+          <option value="work">مناسب للشغل</option>
+        </select>
+        <button class="btn" onclick="suggestMeals()">اقترح لي</button>
+      </div>
+      <div class="result" id="mealSuggestions">الاقتراحات ستظهر هنا.</div>
+    </section>
+
+    <section id="library" class="page">
+      <h2>مكتبة الوجبات</h2>
+      <div class="row">
+        <select id="categoryFilter" onchange="renderMeals()">
+          <option value="all">كل الأنواع</option>
+          <option value="فطور">فطور</option>
+          <option value="غداء">غداء</option>
+          <option value="عشاء">عشاء</option>
+          <option value="سناك">سناك</option>
+        </select>
+        <select id="speedFilter" onchange="renderMeals()">
+          <option value="all">كل الأزمنة</option>
+          <option value="5">5 دقائق أو أقل</option>
+          <option value="10">10 دقائق أو أقل</option>
+          <option value="15">15 دقيقة أو أقل</option>
+        </select>
+        <input id="mealSearch" placeholder="ابحث باسم وجبة أو مكوّن" oninput="renderMeals()" />
+      </div>
+      <div id="mealsContainer" style="margin-top:14px"></div>
+    </section>
+
+    <section id="hungry" class="page">
+      <h2>أنا جوعان</h2>
+      <p class="muted">يحسب الوقت منذ آخر وجبة ويعطيك توجيهًا عمليًا.</p>
+      <div class="row">
+        <button class="btn yellow" onclick="iAmHungry()">أنا جوعان</button>
+        <button class="btn blue" onclick="markMealNow()">سجّل أني أكلت الآن</button>
+        <button class="btn red" onclick="clearLastMeal()">حذف الوجبة الأخيرة</button>
+      </div>
+      <div class="result" id="hungryResult">اضغط على الزر عندما تشعر بالجوع.</div>
+    </section>
+
+    <section id="tracker" class="page">
+      <h2>التتبع اليومي</h2>
+      <p class="muted">سجّل ما أكلته اليوم ليتم حساب الكارب التقريبي وعدد الوجبات.</p>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>إضافة سريعة من الوجبات</h3>
+          <select id="trackerMealSelect"></select>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" onclick="addSelectedMealToLog()">أضف لليوم</button>
+            <button class="btn blue" onclick="resetDailyLog()">تصفير يومي</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>إضافة طعام يدوي</h3>
+          <input id="manualFoodName" placeholder="اسم الطعام" />
+          <input id="manualFoodCarbs" type="number" min="0" step="0.1" placeholder="الكارب بالغرام" />
+          <button class="btn" onclick="addManualFood()">أضف</button>
+        </div>
+      </div>
+      <div class="result">
+        <strong>الهدف اليومي للكارب:</strong> <span id="carbLimitText">30 g</span>
+        <div class="progress"><div id="carbProgress"></div></div>
+      </div>
+      <div id="dailyLogContainer" class="result">لا يوجد سجل طعام لليوم بعد.</div>
+    </section>
+
+    <section id="weekly" class="page">
+      <h2>الخطة الأسبوعية</h2>
+      <p class="muted">اضغط لتوليد خطة أسبوعية من وجبتين يوميًا، ثم استخدمها لبناء قائمة المشتريات.</p>
+      <div class="row">
+        <button class="btn" onclick="generateWeeklyPlan()">ولّد خطة أسبوعية</button>
+        <button class="btn blue" onclick="buildShoppingListFromPlan()">ابنِ قائمة المشتريات</button>
+      </div>
+      <div id="weeklyPlanContainer" style="margin-top:14px"></div>
+    </section>
+
+    <section id="shopping" class="page">
+      <h2>قائمة المشتريات</h2>
+      <p class="muted">تتولد من الخطة الأسبوعية. يمكنك شطب ما اشتريته لأننا نحب الوهم المنظّم.</p>
+      <div class="result shopping-list" id="shoppingListContainer">لم يتم توليد قائمة مشتريات بعد.</div>
+    </section>
+
+    <section id="schedule" class="page">
+      <h2>تنظيم الوجبتين والتنبيه</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>الوجبة الأولى</h3>
+          <input type="time" id="meal1Time" value="12:00" />
+        </div>
+        <div class="card">
+          <h3>الوجبة الثانية</h3>
+          <input type="time" id="meal2Time" value="19:00" />
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="btn" onclick="saveSchedule()">حفظ</button>
+        <button class="btn blue" onclick="requestNotifications()">تفعيل الإشعارات</button>
+      </div>
+      <div class="result" id="scheduleResult">اضبط وقت الوجبتين واحفظهما.</div>
+    </section>
+
+    <section id="snacks" class="page">
+      <h2>النقرشة السريعة</h2>
+      <p class="muted">سناك محسوب لا يعني وجبة متنكرة.</p>
+      <div id="snacksContainer"></div>
+    </section>
+
+    <section id="restaurants" class="page">
+      <h2>خيارات خارج البيت</h2>
+      <p class="muted">عندما تضطر للأكل خارج المنزل، اختر أقل الخيارات سوءًا. الحضارة لم تساعد كثيرًا في هذا الملف.</p>
+      <div id="restaurantsContainer"></div>
+    </section>
+
+    <section id="favorites" class="page">
+      <h2>المفضلة</h2>
+      <div class="result" id="favoritesContainer">لا يوجد مفضلات بعد.</div>
+    </section>
+
+    <section id="guide" class="page">
+      <h2>دليل الالتزام العملي</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>شكل الوجبة المقترح</h3>
+          <ul class="clean">
+            <li>بروتين: 150 إلى 220 غرام مطبوخ تقريبًا</li>
+            <li>خضار قليلة الكارب: 1.5 إلى 3 أكواب</li>
+            <li>دهون مضافة: 1 إلى 2 ملعقة كبيرة غالبًا تكفي</li>
+          </ul>
+          <div class="note">الكيتو المحترف لا يعني أن تحوّل كل شيء إلى جبنة وزيت. هذا مجرد طريق مختصر للملل وزيادة السعرات.</div>
+        </div>
+        <div class="card">
+          <h3>حدود عملية</h3>
+          <ul class="clean">
+            <li>لبنة: 3 إلى 5 ملاعق كبيرة غالبًا مناسبة</li>
+            <li>مكسرات: 20 إلى 30 غرام فقط</li>
+            <li>جبنة: 30 إلى 60 غرام غالبًا كافٍ</li>
+            <li>الخضار الورقية: وسّع بها أكثر من غيرها</li>
+          </ul>
+          <div class="danger-note">إذا بدأت تزيد السناكات لأنك "ضمن الكيتو"، فأنت لا تطبّق النظام، أنت تتحايل على نفسك بطريقة مبدعة قليلًا.</div>
+        </div>
+      </div>
+      <div class="print-row row">
+        <button class="btn purple" onclick="window.print()">طباعة / حفظ PDF</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const foodDB = {
+  "بيض": {status:"ok", note:"مناسب جدًا للكيتو.", good:"2-4 حبات للوجبة", caution:"إذا أضفت معه دهونًا وأجبانًا كثيرة راقب إجمالي الوجبة."},
+  "لبنة": {status:"caution", note:"مسموحة غالبًا بكمية محسوبة.", good:"3-5 ملاعق كبيرة تقريبًا", caution:"أكثر من 6-7 ملاعق يوميًا قد يرفع الكارب والسعرات بسرعة حسب النوع."},
+  "جبنة": {status:"caution", note:"مناسبة غالبًا لكن راقب الكمية.", good:"30-60 غرام للوجبة", caution:"الإفراط بها سهل جدًا خاصة إذا صارت سناكًا مفتوحًا."},
+  "تونة": {status:"ok", note:"مناسبة جدًا.", good:"علبة صغيرة إلى متوسطة للوجبة", caution:"انتبه للنوع والزيوت المضافة والملح."},
+  "دجاج": {status:"ok", note:"مناسب جدًا.", good:"150-220 غرام مطبوخ للوجبة", caution:"المشكلة ليست بالدجاج بل بالإضافات والنشويات الجانبية."},
+  "لحم": {status:"ok", note:"مناسب جدًا.", good:"150-220 غرام مطبوخ للوجبة", caution:"اختر حجمًا واضحًا ولا تجعل الدهون المضافة مبالغًا بها."},
+  "سمك": {status:"ok", note:"مناسب جدًا.", good:"150-220 غرام للوجبة", caution:"انتبه للصلصات الجاهزة."},
+  "زيت زيتون": {status:"ok", note:"دهون ممتازة للكيتو.", good:"1-2 ملعقة كبيرة للوجبة غالبًا تكفي", caution:"3-4 ملاعق بشكل عشوائي ترفع السعرات بسرعة."},
+  "زيتون": {status:"ok", note:"مناسب كسناك أو مع الوجبة.", good:"6-12 حبة", caution:"لا تجعله مفتوحًا بلا حساب."},
+  "خيار": {status:"ok", note:"مناسب جدًا.", good:"1-3 حبات متوسطة", caution:"غالبًا آمن ضمن الكيتو."},
+  "خس": {status:"ok", note:"ممتاز للشبع والحجم.", good:"2-4 أكواب", caution:"لا مشكلة كبيرة عادة."},
+  "سبانخ": {status:"ok", note:"ممتازة.", good:"1-3 أكواب", caution:"آمنة غالبًا."},
+  "كوسا": {status:"ok", note:"مناسبة جدًا.", good:"1-2 حبة متوسطة أو 1-2 كوب", caution:"آمنة غالبًا ضمن الوجبة."},
+  "ملفوف": {status:"ok", note:"مناسب جدًا ويعطي شبعًا جيدًا.", good:"1-3 أكواب", caution:"أغلب الناس يتحملونه جيدًا."},
+  "فليفلة": {status:"caution", note:"مسموحة باعتدال.", good:"نصف إلى 1 حبة متوسطة", caution:"الأفضل عدم الإكثار اليومي إذا أردت كيتو أدق."},
+  "بندورة": {status:"caution", note:"تؤخذ باعتدال.", good:"نصف إلى 1 حبة متوسطة", caution:"لا تعتمد عليها بكميات كبيرة."},
+  "بصل": {status:"caution", note:"للطعم أكثر من الحجم.", good:"1-3 ملاعق كبيرة مفروم", caution:"الإكثار منه يرفع الكارب بسرعة."},
+  "مكسرات": {status:"caution", note:"مسموحة لكن خطيرة من ناحية الكمية.", good:"20-30 غرام فقط", caution:"أكثر من ذلك يحوّل السناك إلى وجبة سعرات."},
+  "رز": {status:"no", note:"غير مناسب للكيتو.", good:"غير مناسب", caution:"حتى الكمية الصغيرة غالبًا لا تخدم هدفك هنا."},
+  "خبز": {status:"no", note:"غير مناسب للكيتو.", good:"غير مناسب", caution:"الخبز لا يحتاج فلسفة، فقط لا."},
+  "معكرونة": {status:"no", note:"غير مناسبة للكيتو.", good:"غير مناسب", caution:"نشويات واضحة."},
+  "بطاطا": {status:"no", note:"غير مناسبة للكيتو.", good:"غير مناسب", caution:"مرتفعة النشويات."},
+  "تفاح": {status:"no", note:"غالبًا غير مناسب للكيتو التقليدي.", good:"غير مناسب", caution:"سكره مرتفع نسبيًا."},
+  "موز": {status:"no", note:"غير مناسب للكيتو التقليدي.", good:"غير مناسب", caution:"مرتفع السكر."}
+};
+
+const meals = [
+  {id:1,name:"بيض مع خيار وزيتون",type:"فطور",time:8,goal:["weight","fast","cheap"],ingredients:["بيض","خيار","زيتون"],portion:"3 بيضات + 1-2 خيار + 6-10 زيتونات",carbs:4,carbText:"منخفض جدًا",prep:"اطبخ البيض بالطريقة التي تفضّلها وقدّمه مع الخيار والزيتون.",tags:["سريع","مشبع"]},
+  {id:2,name:"أومليت جبنة وسبانخ",type:"فطور",time:10,goal:["weight","fast"],ingredients:["بيض","جبنة","سبانخ"],portion:"2-3 بيض + 30-40غ جبنة + كوب سبانخ",carbs:5,carbText:"منخفض",prep:"اخفق البيض مع السبانخ والجبنة ثم اطهه.",tags:["فطور","بروتين"]},
+  {id:3,name:"لبنة مع زيت زيتون وخيار",type:"فطور",time:5,goal:["fast","cheap","work"],ingredients:["لبنة","زيت زيتون","خيار"],portion:"4 ملاعق لبنة + 1 ملعقة زيت + 1-2 خيار",carbs:7,carbText:"منخفض معتدل",prep:"قدّم اللبنة مع الزيت والخيار.",tags:["بدون طبخ","سريع جدًا"]},
+  {id:4,name:"تونة مع سلطة خضراء",type:"غداء",time:7,goal:["weight","fast","work"],ingredients:["تونة","خس","خيار","زيت زيتون"],portion:"علبة تونة + 2 كوب سلطة + 1 ملعقة زيت",carbs:5,carbText:"منخفض",prep:"اخلط التونة مع السلطة وأضف الزيت.",tags:["شغل","خفيف"]},
+  {id:5,name:"دجاج مشوي مع سلطة",type:"غداء",time:15,goal:["weight","cheap"],ingredients:["دجاج","خس","خيار","زيت زيتون"],portion:"180-220غ دجاج + 2-3 أكواب سلطة",carbs:6,carbText:"منخفض",prep:"قدّم الدجاج مع سلطة كبيرة.",tags:["أساسي","مشبع"]},
+  {id:6,name:"لحم مع كوسا مطبوخة",type:"غداء",time:15,goal:["weight"],ingredients:["لحم","كوسا"],portion:"180-220غ لحم + 1-2 كوب كوسا",carbs:7,carbText:"منخفض",prep:"اطبخ الكوسا وقدمها مع اللحم.",tags:["غداء","شبع"]},
+  {id:7,name:"بيض مسلوق مع لبنة",type:"عشاء",time:6,goal:["fast","cheap","work"],ingredients:["بيض","لبنة"],portion:"2-3 بيض + 3 ملاعق لبنة",carbs:5,carbText:"منخفض معتدل",prep:"اسلق البيض وقدّمه مع اللبنة.",tags:["خفيف","سهل"]},
+  {id:8,name:"جبنة مع خيار وزيتون",type:"عشاء",time:5,goal:["fast","cheap","work"],ingredients:["جبنة","خيار","زيتون"],portion:"40-60غ جبنة + 1-2 خيار + 6-8 زيتونات",carbs:4,carbText:"منخفض",prep:"رتّب المكونات في طبق سريع.",tags:["بدون طبخ"]},
+  {id:9,name:"تونة مع لبنة وخيار",type:"عشاء",time:5,goal:["fast","work"],ingredients:["تونة","لبنة","خيار"],portion:"علبة تونة + 2-3 ملاعق لبنة + 1 خيار",carbs:6,carbText:"منخفض معتدل",prep:"اخلط التونة مع اللبنة وقدّمها مع الخيار.",tags:["سريع","مشبع"]},
+  {id:10,name:"سلطة ملفوف مع دجاج",type:"غداء",time:12,goal:["weight","cheap","work"],ingredients:["ملفوف","دجاج","زيت زيتون"],portion:"180غ دجاج + 2 كوب ملفوف + 1 ملعقة زيت",carbs:8,carbText:"منخفض",prep:"افرِم الملفوف وأضف الدجاج والزيت.",tags:["ألياف","شبع"]},
+  {id:11,name:"بيض مع تونة",type:"فطور",time:10,goal:["weight","cheap"],ingredients:["بيض","تونة"],portion:"2 بيض + نصف إلى علبة تونة",carbs:2,carbText:"منخفض",prep:"حضّر بيضًا مع التونة.",tags:["بروتين عالي"]},
+  {id:12,name:"لبنة بالزعتر وزيت الزيتون",type:"سناك",time:3,goal:["fast","cheap","work"],ingredients:["لبنة","زيت زيتون"],portion:"2-3 ملاعق لبنة + 1 ملعقة صغيرة زيت",carbs:4,carbText:"منخفض معتدل",prep:"أضف قليل زعتر إن رغبت.",tags:["سناك","سريع"]},
+  {id:13,name:"حفنة مكسرات محسوبة",type:"سناك",time:1,goal:["fast","work"],ingredients:["مكسرات"],portion:"20-30غ فقط",carbs:5,carbText:"منخفض معتدل",prep:"التزم بكمية موزونة أو مقاسة.",tags:["سناك","انتبه للكمية"]},
+  {id:14,name:"زيتون وجبنة",type:"سناك",time:2,goal:["fast","work","cheap"],ingredients:["زيتون","جبنة"],portion:"6-8 زيتونات + 30غ جبنة",carbs:3,carbText:"منخفض",prep:"حل بسيط ومحدد.",tags:["مقرمش نسبيًا"]},
+  {id:15,name:"كوسا سوتيه مع جبنة",type:"عشاء",time:10,goal:["weight","cheap"],ingredients:["كوسا","جبنة"],portion:"1-2 كوب كوسا + 30-40غ جبنة",carbs:6,carbText:"منخفض",prep:"شوّح الكوسا ثم أضف الجبنة.",tags:["عشاء","سهل"]},
+  {id:16,name:"باذنجان مع لحم",type:"غداء",time:15,goal:["weight"],ingredients:["باذنجان","لحم"],portion:"150-180غ لحم + 1 كوب باذنجان",carbs:8,carbText:"منخفض معتدل",prep:"اطبخ الباذنجان واللحم دون إضافات سكرية.",tags:["مشبع"]},
+  {id:17,name:"قهوة بدون سكر مع بيض",type:"فطور",time:7,goal:["fast","work"],ingredients:["قهوة","بيض"],portion:"1 كوب قهوة + 2-3 بيض",carbs:2,carbText:"منخفض جدًا",prep:"قهوة بدون سكر مع بيض واضح.",tags:["صباحي"]},
+  {id:18,name:"سلطة تونة بالملفوف والخيار",type:"غداء",time:9,goal:["weight","fast","work"],ingredients:["تونة","ملفوف","خيار"],portion:"علبة تونة + 2 كوب خضار",carbs:7,carbText:"منخفض",prep:"اخلط المكونات مع قليل زيت زيتون.",tags:["ألياف"]},
+  {id:19,name:"بيض مع جبنة ولحم",type:"عشاء",time:12,goal:["weight"],ingredients:["بيض","جبنة","لحم"],portion:"2 بيض + 100-150غ لحم + 25-30غ جبنة",carbs:4,carbText:"منخفض",prep:"اطبخ اللحم ثم أضف البيض والجبنة.",tags:["مشبع جدًا"]},
+  {id:20,name:"سلطة كبيرة مع جبنة",type:"عشاء",time:8,goal:["weight","fast"],ingredients:["خس","خيار","جبنة","زيت زيتون"],portion:"2-3 أكواب سلطة + 30-40غ جبنة + 1 ملعقة زيت",carbs:6,carbText:"منخفض",prep:"اخلط السلطة وقدّمها مع الجبنة.",tags:["خفيف","مرن"]}
+];
+
+const snacks = [
+  {name:"خيار مع لبنة", amount:"1 خيار + 2-3 ملاعق لبنة", time:"2 دقيقة", how:"قطّع الخيار وقدّمه مع اللبنة."},
+  {name:"زيتون مع جبنة", amount:"6-8 زيتونات + 30غ جبنة", time:"1 دقيقة", how:"مناسب عندما تريد شيئًا صغيرًا لا وجبة كاملة."},
+  {name:"بيض مسلوق", amount:"1-2 بيضة", time:"جاهز", how:"حل مشبع نسبيًا ومحدد."},
+  {name:"لوز أو جوز", amount:"20-25غ", time:"1 دقيقة", how:"خذه في وعاء صغير لا من الكيس مباشرة."},
+  {name:"تونة سريعة", amount:"نصف إلى علبة صغيرة", time:"3 دقائق", how:"قدّمها مع خيار أو خس."}
+];
+
+const restaurantIdeas = [
+  {place:"مطعم مشاوي", best:"شيش طاووق أو لحم مشوي + سلطة + بدون خبز", caution:"انتبه للبطاطا والرز والصلصات الحلوة."},
+  {place:"برغر", best:"اطلب البرغر بدون خبز + سلطة", caution:"لا تجعل الجبن والصوصات المفتوحة تعوّض كل شيء."},
+  {place:"شاورما", best:"طبق شاورما بدون خبز مع سلطة", caution:"الطربوش الكامل مع الثوم والبطاطا ليس كيتو مهما أقنعت نفسك."},
+  {place:"فطور شرقي", best:"بيض + جبنة + زيتون + خضار", caution:"المشكلة في الخبز والمربيات والفول بكميات كبيرة."},
+  {place:"سلطات", best:"سلطة مع دجاج أو تونة + زيت زيتون", caution:"تأكد من عدم وجود صوص سكري أو ذرة أو قطع مقرمشة."}
+];
+
+const carbLimit = 30;
+let favorites = JSON.parse(localStorage.getItem("ketoFavoritesV3") || "[]");
+let lastMealTime = localStorage.getItem("ketoLastMealTimeV3") || "";
+let lastMealLabel = localStorage.getItem("ketoLastMealLabelV3") || "";
+let schedule = JSON.parse(localStorage.getItem("ketoScheduleV3") || '{"meal1":"12:00","meal2":"19:00"}');
+let dailyLog = JSON.parse(localStorage.getItem("ketoDailyLogV3") || "[]");
+let weeklyPlan = JSON.parse(localStorage.getItem("ketoWeeklyPlanV3") || "[]");
+let notified = {meal1:false, meal2:false};
+
+function showPage(id, el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(el) el.classList.add("active");
+}
+function normalizeArabic(text){
+  return (text || "").trim().toLowerCase()
+    .replace(/[أإآ]/g, "ا")
+    .replace(/ة/g, "ه")
+    .replace(/ى/g, "ي");
+}
+function statusBadge(status){
+  if(status==="ok") return '<span class="badge ok">مسموح</span>';
+  if(status==="caution") return '<span class="badge caution">بحذر</span>';
+  return '<span class="badge no">غير مناسب</span>';
+}
+function findFood(name){
+  const key = Object.keys(foodDB).find(k => normalizeArabic(k) === normalizeArabic(name));
+  return key ? {key, ...foodDB[key]} : null;
+}
+function checkFood(){
+  const val = document.getElementById("foodInput").value.trim();
+  const box = document.getElementById("foodResult");
+  if(!val){
+    box.innerHTML = "اكتب اسم الطعام أولًا.";
+    return;
+  }
+  const found = findFood(val);
+  if(found){
+    box.innerHTML = `
+      ${statusBadge(found.status)} <strong>${found.key}</strong><br>
+      ${found.note}
+      <div class="qty">
+        <strong>الكمية المناسبة غالبًا:</strong> ${found.good}<br>
+        <strong>متى تنتبه؟</strong> ${found.caution}
+      </div>
+    `;
+  } else {
+    box.innerHTML = `لا توجد نتيجة مباشرة لـ <strong>${val}</strong>. القاعدة التقريبية: البروتين والخضار قليلة الكارب غالبًا مناسبة، أما النشويات والسكريات فغالبًا لا.`;
+  }
+}
+function renderQuickFoods(){
+  const picks = ["بيض","لبنة","جبنة","تونة","دجاج","مكسرات","خيار","رز","خبز"];
+  document.getElementById("quickFoods").innerHTML = picks.map(name => {
+    const f = foodDB[name];
+    return `<div class="item-card">
+      ${statusBadge(f.status)} <strong>${name}</strong>
+      <div class="small muted" style="margin-top:6px">${f.note}</div>
+      <div class="qty"><strong>مناسب غالبًا:</strong> ${f.good}</div>
+    </div>`;
+  }).join("");
+}
+function renderMeals(){
+  const cat = document.getElementById("categoryFilter").value;
+  const speed = document.getElementById("speedFilter").value;
+  const search = normalizeArabic(document.getElementById("mealSearch").value);
+  const container = document.getElementById("mealsContainer");
+  let filtered = meals.filter(meal => {
+    const catOk = cat==="all" || meal.type===cat;
+    const speedOk = speed==="all" || meal.time <= Number(speed);
+    const blob = normalizeArabic([meal.name, meal.type, meal.ingredients.join(" "), meal.tags.join(" ")].join(" "));
+    const searchOk = !search || blob.includes(search);
+    return catOk && speedOk && searchOk;
+  });
+  document.getElementById("mealCount").textContent = filtered.length;
+  container.innerHTML = filtered.map(meal => `
+    <div class="meal-card">
+      <div class="meal-head">
+        <div>
+          <h3>${meal.name}</h3>
+          <div>${meal.tags.map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        </div>
+        <div class="small muted">${meal.type} | ${meal.time} دقائق</div>
+      </div>
+      <div class="small muted" style="margin-top:8px">الكارب التقريبي: ${meal.carbs}g</div>
+      <div><strong>المكونات:</strong> ${meal.ingredients.join("، ")}</div>
+      <div class="qty"><strong>الكمية المقترحة:</strong> ${meal.portion}</div>
+      <div><strong>التحضير:</strong> ${meal.prep}</div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" onclick="toggleFavorite(${meal.id})">${favorites.includes(meal.id) ? "إزالة من المفضلة" : "إضافة للمفضلة"}</button>
+        <button class="btn blue" onclick="useMealNow('${meal.name.replace(/'/g, "\\'")}')">اعتبرها وجبتي الآن</button>
+        <button class="btn purple" onclick="addMealToLog(${meal.id})">أضف لليوم</button>
+      </div>
+    </div>
+  `).join("") || '<div class="result">لا توجد نتائج بهذه الفلاتر.</div>';
+}
+function suggestMeals(){
+  const raw = document.getElementById("ingredientsInput").value.trim();
+  const goal = document.getElementById("goalFilter").value;
+  const box = document.getElementById("mealSuggestions");
+  if(!raw){
+    box.innerHTML = "اكتب المكونات الموجودة عندك أولًا.";
+    return;
+  }
+  const items = raw.split(/[،,]/).map(x=>x.trim()).filter(Boolean);
+  const normItems = items.map(normalizeArabic);
+  let matches = meals.filter(meal => {
+    const mealIng = meal.ingredients.map(normalizeArabic);
+    const matched = mealIng.filter(i => normItems.includes(i)).length;
+    const goalOk = goal==="all" || meal.goal.includes(goal);
+    return matched >= Math.min(2, meal.ingredients.length) && goalOk;
+  });
+  if(matches.length === 0){
+    matches = meals.filter(meal => meal.ingredients.map(normalizeArabic).some(i => normItems.includes(i)));
+  }
+  if(matches.length === 0){
+    box.innerHTML = "لم أجد تطابقًا جيدًا. جرّب إدخال مكونات أساسية أو أكثر وضوحًا.";
+    return;
+  }
+  box.innerHTML = matches.slice(0,8).map(meal => `
+    <div class="meal-card">
+      <div class="meal-head">
+        <h3>${meal.name}</h3>
+        <div class="small muted">${meal.type} | ${meal.time} دقائق</div>
+      </div>
+      <div><strong>المكونات:</strong> ${meal.ingredients.join("، ")}</div>
+      <div class="qty"><strong>الكمية المقترحة:</strong> ${meal.portion}</div>
+      <div><strong>الكارب التقريبي:</strong> ${meal.carbs}g</div>
+      <div><strong>التحضير:</strong> ${meal.prep}</div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" onclick="toggleFavorite(${meal.id})">${favorites.includes(meal.id) ? "إزالة من المفضلة" : "إضافة للمفضلة"}</button>
+        <button class="btn blue" onclick="useMealNow('${meal.name.replace(/'/g, "\\'")}')">اعتبرها وجبتي الآن</button>
+        <button class="btn purple" onclick="addMealToLog(${meal.id})">أضف لليوم</button>
+      </div>
+    </div>
+  `).join("");
+}
+function toggleFavorite(id){
+  if(favorites.includes(id)) favorites = favorites.filter(x => x !== id);
+  else favorites.push(id);
+  localStorage.setItem("ketoFavoritesV3", JSON.stringify(favorites));
+  updateFavorites();
+  renderMeals();
+}
+function updateFavorites(){
+  const box = document.getElementById("favoritesContainer");
+  const favMeals = meals.filter(m => favorites.includes(m.id));
+  document.getElementById("favCount").textContent = favMeals.length;
+  if(favMeals.length === 0){
+    box.innerHTML = "لا يوجد مفضلات بعد.";
+    return;
+  }
+  box.innerHTML = favMeals.map(meal => `
+    <div class="meal-card">
+      <div class="meal-head">
+        <h3>${meal.name}</h3>
+        <div class="small muted">${meal.type}</div>
+      </div>
+      <div class="qty"><strong>الكمية:</strong> ${meal.portion}</div>
+      <div><strong>الكارب:</strong> ${meal.carbs}g</div>
+      <div><strong>التحضير:</strong> ${meal.prep}</div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn red" onclick="toggleFavorite(${meal.id})">إزالة</button>
+        <button class="btn blue" onclick="useMealNow('${meal.name.replace(/'/g, "\\'")}')">اعتبرها وجبتي الآن</button>
+        <button class="btn purple" onclick="addMealToLog(${meal.id})">أضف لليوم</button>
+      </div>
+    </div>
+  `).join("");
+}
+function useMealNow(name){
+  lastMealTime = new Date().toISOString();
+  lastMealLabel = name;
+  localStorage.setItem("ketoLastMealTimeV3", lastMealTime);
+  localStorage.setItem("ketoLastMealLabelV3", lastMealLabel);
+  updateLastMealDisplay();
+  document.getElementById("hungryResult").innerHTML = `تم تسجيل <strong>${name}</strong> كوجبتك الحالية.`;
+}
+function markMealNow(){
+  lastMealTime = new Date().toISOString();
+  lastMealLabel = "تسجيل يدوي";
+  localStorage.setItem("ketoLastMealTimeV3", lastMealTime);
+  localStorage.setItem("ketoLastMealLabelV3", lastMealLabel);
+  updateLastMealDisplay();
+  document.getElementById("hungryResult").innerHTML = "تم تسجيل وقت الأكل الحالي.";
+}
+function clearLastMeal(){
+  lastMealTime = "";
+  lastMealLabel = "";
+  localStorage.removeItem("ketoLastMealTimeV3");
+  localStorage.removeItem("ketoLastMealLabelV3");
+  updateLastMealDisplay();
+  document.getElementById("hungryResult").innerHTML = "تم حذف آخر وجبة.";
+}
+function humanDiff(dateIso){
+  const then = new Date(dateIso);
+  const now = new Date();
+  const mins = Math.floor((now - then) / 60000);
+  const hrs = Math.floor(mins / 60);
+  const rem = mins % 60;
+  return {mins, hrs, rem};
+}
+function iAmHungry(){
+  const box = document.getElementById("hungryResult");
+  if(!lastMealTime){
+    box.innerHTML = "لا يوجد وقت لوجبة سابقة مسجل. إذا أكلت للتو سجّل ذلك أولًا.";
+    return;
+  }
+  const d = humanDiff(lastMealTime);
+  let advice = "";
+  if(d.mins < 90){
+    advice = "مرّ وقت قصير نسبيًا. جرّب ماء أولًا. وإذا احتجت شيئًا فعلًا، فاختر سناكًا صغيرًا ومحدد الكمية مثل 1-2 بيضة أو خيار مع 2-3 ملاعق لبنة.";
+  } else if(d.mins < 240){
+    advice = "هذا وقت منطقي لسناك محسوب أو تحضير الوجبة القادمة. لا تحول الجوع المتوسط إلى وجبة إضافية كبيرة.";
+  } else {
+    advice = "مرّ وقت طويل. الأفضل الآن وجبة رئيسية واضحة فيها بروتين وخضار قليلة الكارب.";
+  }
+  box.innerHTML = `مرّ على آخر وجبة <strong>${d.hrs} ساعة و${d.rem} دقيقة</strong>.<br>${advice}`;
+}
+function saveSchedule(){
+  schedule = {
+    meal1: document.getElementById("meal1Time").value,
+    meal2: document.getElementById("meal2Time").value
+  };
+  localStorage.setItem("ketoScheduleV3", JSON.stringify(schedule));
+  updateNextMealDisplay();
+  document.getElementById("scheduleResult").innerHTML = `تم حفظ موعدي الوجبتين: <strong>${schedule.meal1}</strong> و <strong>${schedule.meal2}</strong>.`;
+}
+function requestNotifications(){
+  if(!("Notification" in window)){
+    document.getElementById("scheduleResult").innerHTML = "المتصفح لا يدعم الإشعارات بالشكل المطلوب.";
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    document.getElementById("scheduleResult").innerHTML = permission === "granted"
+      ? "تم تفعيل الإشعارات. تعمل أفضل عندما تكون الصفحة مفتوحة."
+      : "لم يتم منح إذن الإشعارات.";
+  });
+}
+function sendNotification(title, body){
+  if("Notification" in window && Notification.permission === "granted"){
+    new Notification(title, {body});
+  }
+}
+function updateLastMealDisplay(){
+  if(!lastMealTime){
+    document.getElementById("lastMealDisplay").textContent = "غير مسجلة";
+    return;
+  }
+  const d = new Date(lastMealTime);
+  const txt = d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+  document.getElementById("lastMealDisplay").textContent = (lastMealLabel ? lastMealLabel + " - " : "") + txt;
+}
+function minutesOfTime(t){
+  const [h,m] = t.split(":").map(Number);
+  return h*60+m;
+}
+function updateNextMealDisplay(){
+  const now = new Date();
+  const current = now.getHours()*60 + now.getMinutes();
+  const m1 = minutesOfTime(schedule.meal1);
+  const m2 = minutesOfTime(schedule.meal2);
+  let next = current <= m1 ? schedule.meal1 : current <= m2 ? schedule.meal2 : schedule.meal1 + " غدًا";
+  document.getElementById("nextMealDisplay").textContent = next;
+}
+function checkMealNotifications(){
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,"0");
+  const mm = String(now.getMinutes()).padStart(2,"0");
+  const current = `${hh}:${mm}`;
+  if(current === schedule.meal1 && !notified.meal1){
+    sendNotification("حان وقت الوجبة الأولى", "جهّز وجبتك الأولى بدل تأجيلها حتى تنهار على أي شيء.");
+    notified.meal1 = true;
+  }
+  if(current === schedule.meal2 && !notified.meal2){
+    sendNotification("حان وقت الوجبة الثانية", "وقت الوجبة الثانية. اجعلها واضحة ومشبعة.");
+    notified.meal2 = true;
+  }
+  if(current === "00:00") notified = {meal1:false, meal2:false};
+}
+function renderSnacks(){
+  document.getElementById("snacksContainer").innerHTML = snacks.map(s => `
+    <div class="meal-card">
+      <div class="meal-head">
+        <h3>${s.name}</h3>
+        <div class="small muted">${s.time}</div>
+      </div>
+      <div class="qty"><strong>الكمية:</strong> ${s.amount}</div>
+      <div><strong>التحضير:</strong> ${s.how}</div>
+    </div>
+  `).join("");
+}
+function renderRestaurants(){
+  document.getElementById("restaurantsContainer").innerHTML = restaurantIdeas.map(r => `
+    <div class="meal-card">
+      <h3>${r.place}</h3>
+      <div><strong>أفضل اختيار:</strong> ${r.best}</div>
+      <div class="qty"><strong>انتبه:</strong> ${r.caution}</div>
+    </div>
+  `).join("");
+}
+function fillTrackerSelect(){
+  const sel = document.getElementById("trackerMealSelect");
+  sel.innerHTML = meals.map(m => `<option value="${m.id}">${m.name} - ${m.carbs}g carbs</option>`).join("");
+}
+function addMealToLog(id){
+  const meal = meals.find(m => m.id === id);
+  if(!meal) return;
+  dailyLog.push({
+    type:"meal",
+    name:meal.name,
+    carbs:meal.carbs,
+    time:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})
+  });
+  saveDailyLog();
+  renderDailyLog();
+}
+function addSelectedMealToLog(){
+  addMealToLog(Number(document.getElementById("trackerMealSelect").value));
+}
+function addManualFood(){
+  const name = document.getElementById("manualFoodName").value.trim();
+  const carbs = parseFloat(document.getElementById("manualFoodCarbs").value);
+  if(!name || isNaN(carbs) || carbs < 0) return;
+  dailyLog.push({
+    type:"manual",
+    name:name,
+    carbs:carbs,
+    time:new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"})
+  });
+  document.getElementById("manualFoodName").value = "";
+  document.getElementById("manualFoodCarbs").value = "";
+  saveDailyLog();
+  renderDailyLog();
+}
+function saveDailyLog(){
+  localStorage.setItem("ketoDailyLogV3", JSON.stringify(dailyLog));
+}
+function resetDailyLog(){
+  dailyLog = [];
+  saveDailyLog();
+  renderDailyLog();
+}
+function totalDailyCarbs(){
+  return dailyLog.reduce((s,i)=>s + Number(i.carbs || 0), 0);
+}
+function renderDailyLog(){
+  const total = totalDailyCarbs();
+  document.getElementById("todayCarbsDisplay").textContent = `${total} g`;
+  document.getElementById("carbLimitText").textContent = `${carbLimit} g`;
+  document.getElementById("carbProgress").style.width = `${Math.min(100, (total/carbLimit)*100)}%`;
+  const box = document.getElementById("dailyLogContainer");
+  if(dailyLog.length === 0){
+    box.innerHTML = "لا يوجد سجل طعام لليوم بعد.";
+    return;
+  }
+  box.innerHTML = `
+    <strong>إجمالي الكارب اليوم:</strong> ${total}g
+    ${total > carbLimit ? '<div class="danger-note">تجاوزت الحد التقريبي لليوم. ليس نهاية العالم، لكن لا تكمل اليوم وكأن شيئًا لم يحدث.</div>' : ''}
+    <div style="margin-top:12px">
+      ${dailyLog.map((item, idx) => `
+        <div class="item-card">
+          <div class="meal-head">
+            <strong>${item.name}</strong>
+            <span class="small muted">${item.time}</span>
+          </div>
+          <div>الكارب: ${item.carbs}g</div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn red" onclick="removeLogItem(${idx})">حذف</button>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+function removeLogItem(idx){
+  dailyLog.splice(idx,1);
+  saveDailyLog();
+  renderDailyLog();
+}
+function generateWeeklyPlan(){
+  const days = ["السبت","الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة"];
+  let mains = meals.filter(m => m.type !== "سناك");
+  let plan = [];
+  for(let i=0;i<7;i++){
+    const meal1 = mains[(i*2) % mains.length];
+    const meal2 = mains[(i*2+1) % mains.length];
+    plan.push({day:days[i], meal1, meal2});
+  }
+  weeklyPlan = plan;
+  localStorage.setItem("ketoWeeklyPlanV3", JSON.stringify(weeklyPlan));
+  renderWeeklyPlan();
+}
+function renderWeeklyPlan(){
+  const box = document.getElementById("weeklyPlanContainer");
+  if(!weeklyPlan.length){
+    box.innerHTML = '<div class="result">لم يتم توليد خطة أسبوعية بعد.</div>';
+    return;
+  }
+  box.innerHTML = `<div class="calendar">${
+    weeklyPlan.map(d => `
+      <div class="day-card">
+        <h4>${d.day}</h4>
+        <div class="item-card">
+          <strong>الوجبة 1:</strong> ${d.meal1.name}
+          <div class="small muted">الكارب: ${d.meal1.carbs}g</div>
+        </div>
+        <div class="item-card">
+          <strong>الوجبة 2:</strong> ${d.meal2.name}
+          <div class="small muted">الكارب: ${d.meal2.carbs}g</div>
+        </div>
+      </div>
+    `).join("")
+  }</div>`;
+}
+function buildShoppingListFromPlan(){
+  if(!weeklyPlan.length){
+    generateWeeklyPlan();
+  }
+  const counts = {};
+  weeklyPlan.forEach(d => {
+    [d.meal1, d.meal2].forEach(meal => {
+      meal.ingredients.forEach(ing => {
+        counts[ing] = (counts[ing] || 0) + 1;
+      });
+    });
+  });
+  const box = document.getElementById("shoppingListContainer");
+  const items = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  box.innerHTML = items.map(([name,count], idx) => `
+    <label><input type="checkbox" id="shop${idx}" /> ${name} <span class="small muted">(${count} مرات ضمن الخطة)</span></label>
+  `).join("") || "لا توجد بيانات كافية.";
+  showPage('shopping', document.querySelectorAll('.nav button')[7]);
+}
+function loadSaved(){
+  document.getElementById("meal1Time").value = schedule.meal1 || "12:00";
+  document.getElementById("meal2Time").value = schedule.meal2 || "19:00";
+  updateLastMealDisplay();
+  updateNextMealDisplay();
+}
+renderQuickFoods();
+renderMeals();
+renderSnacks();
+renderRestaurants();
+updateFavorites();
+fillTrackerSelect();
+renderDailyLog();
+renderWeeklyPlan();
+loadSaved();
+setInterval(() => {
+  checkMealNotifications();
+  updateNextMealDisplay();
+}, 30000);
+</script>
+</body>
+</html>
